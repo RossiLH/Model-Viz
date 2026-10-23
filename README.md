@@ -239,7 +239,7 @@ https://juejin.cn/user/351470467691175
 
 https://blog.csdn.net/weixin_47364682
 
-![微信公众号](.\assets\RossiXYZ_qrcode.bmp)
+![微信公众号](assets/RossiXYZ_qrcode.bmp)
 
 
 
