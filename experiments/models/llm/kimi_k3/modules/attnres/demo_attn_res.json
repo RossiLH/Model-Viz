@@ -1,0 +1,38 @@
+{
+  "config": {
+    "dim": 16,
+    "n_units": 6,
+    "block_units": 3,
+    "steps": 260,
+    "batch": 16,
+    "lr": 0.02
+  },
+  "alpha_before_last_unit": [
+    0.3333,
+    0.3333,
+    0.3333
+  ],
+  "alpha_after_last_unit": [
+    0.3333,
+    0.3333,
+    0.3333
+  ],
+  "sources_growth_block": [
+    1,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3
+  ],
+  "sources_growth_full": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ]
+}

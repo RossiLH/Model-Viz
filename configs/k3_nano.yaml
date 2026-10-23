@@ -1,0 +1,88 @@
+# Nano: the correctness proof. Same code path as k3_2p8t, ~30M parameters, runs
+# on CPU or inside a ~700MB GPU budget.
+name: k3_nano
+
+model:
+  dim: 256
+  n_layers: 9               # 2 x [KDA KDA KDA MLA] + 1 trailing Gated MLA
+  vocab_size: 512           # byte tokenizer + XTML specials
+  hybrid_ratio: 3
+  trailing_global: true
+  n_dense_layers: 1
+  dense_ffn_hidden: 640
+  tie_embeddings: true
+
+  kda:
+    num_heads: 8
+    head_dim_k: 32
+    head_dim_v: 32
+    alpha_rank: 32
+    conv_kernel: 4
+    chunk_size: 64
+    tile_size: 16
+    g_min: -5.0
+    alpha_init: 0.99
+
+  mla:
+    num_heads: 8
+    qk_head_dim: 32
+    v_head_dim: 32
+    q_lora_rank: 128
+    kv_lora_rank: 64
+    attn_out_fp32: true
+
+  moe:
+    n_routed: 16
+    n_shared: 2
+    top_k: 2
+    latent_dim: 128
+    expert_hidden: 256
+    shared_hidden: 256
+    situ_beta_gate: 4.0
+    situ_beta_up: 25.0
+    rmsnorm_before_up: true
+    qb_enabled: true
+    qb_bins: 256
+
+  attn_res:
+    enabled: true
+    block_size: 3
+    granularity: sublayer
+
+  mtp:
+    enabled: true
+    n_layers: 1
+    layer_kind: mla
+
+  vit:
+    enabled: false
+    n_layers: 4
+    dim: 128
+    num_heads: 4
+    patch_size: 14
+    mlp_hidden: 384
+    pixel_shuffle: 2
+
+train:
+  steps: 2000
+  log_every: 20
+  out_dir: runs/nano
+  dtype: float32
+  device: auto
+  gradient_checkpointing: true
+  curriculum: [512, 1024, 2048, 8192]
+  curriculum_step_fractions: [0.5, 0.75, 0.9, 1.0]
+  optim:
+    lr: 0.002
+    adamw_lr: 0.0006
+    weight_decay: 0.1
+    schedule: cosine
+    warmup_ratio: 0.01
+    per_head: true
+  data:
+    tokenizer: bytes
+    seq_len: 2048
+    micro_batch_size: 4
+    grad_accum: 1
+  parallel:
+    activation_policy: recompute

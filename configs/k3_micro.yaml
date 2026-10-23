@@ -1,0 +1,88 @@
+# Micro: multi-process parity rung. Exercises MoonEP, KCP, pipeline ZeRO-2 and
+# the 8K -> 64K curriculum transition at a size that still fits a single node.
+name: k3_micro
+
+model:
+  dim: 1024
+  n_layers: 13              # 3 x [KDA KDA KDA MLA] + 1 trailing Gated MLA
+  vocab_size: 32768
+  hybrid_ratio: 3
+  trailing_global: true
+  n_dense_layers: 1
+  dense_ffn_hidden: 2816
+  tie_embeddings: true
+
+  kda:
+    num_heads: 16
+    head_dim_k: 64
+    head_dim_v: 64
+    alpha_rank: 64
+    conv_kernel: 4
+    chunk_size: 64
+    tile_size: 16
+
+  mla:
+    num_heads: 16
+    qk_head_dim: 64
+    v_head_dim: 64
+    q_lora_rank: 384
+    kv_lora_rank: 128
+
+  moe:
+    n_routed: 64
+    n_shared: 2
+    top_k: 8
+    latent_dim: 512
+    expert_hidden: 704
+    shared_hidden: 704
+    rmsnorm_before_up: true
+    qb_enabled: true
+    qb_bins: 512
+
+  attn_res:
+    enabled: true
+    block_size: 4
+    granularity: sublayer
+
+  mtp:
+    enabled: true
+    n_layers: 1
+    layer_kind: mla
+
+  vit:
+    enabled: true
+    n_layers: 6
+    dim: 384
+    num_heads: 6
+    patch_size: 14
+    mlp_hidden: 1024
+    pixel_shuffle: 2
+
+train:
+  steps: 20000
+  log_every: 20
+  out_dir: runs/micro
+  dtype: bfloat16
+  gradient_checkpointing: true
+  curriculum: [2048, 8192, 32768, 65536]
+  curriculum_step_fractions: [0.5, 0.75, 0.9, 1.0]
+  optim:
+    lr: 0.001
+    weight_decay: 0.1
+    schedule: cosine
+    warmup_ratio: 0.01
+  data:
+    tokenizer: bytes
+    seq_len: 2048
+    micro_batch_size: 1
+    grad_accum: 4
+    vision_fraction: 0.2
+  parallel:
+    pp: 2
+    ep: 4
+    cp: 2
+    zero_stage: 2
+    pipeline_zero2: true
+    activation_policy: recompute
+    moonep: true
+    muon_p2p: true

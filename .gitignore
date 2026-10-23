@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+wheels/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.venv*/
+
+# Testing / type checking / linting
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Gradio
+gradio_cached_examples/
+.flag/
+
+# Probe script outputs (regenerate by running scripts/models/**/NN_probe_*.py)
+scripts/models/**/outputs/
+
+# Large local artifacts (models, datasets, logs)
+outputs/
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+data/
+datasets/
+logs/
+runs/
+wandb/
+mlruns/
+
+# Reference PDFs (large; fetch from arXiv instead — see README)
+# paper/

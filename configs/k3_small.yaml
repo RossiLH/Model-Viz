@@ -1,0 +1,88 @@
+# Small: first genuinely multi-node rung, ~20B total / ~3B activated.
+name: k3_small
+
+model:
+  dim: 2048
+  n_layers: 25              # 6 x [KDA KDA KDA MLA] + 1 trailing Gated MLA
+  vocab_size: 65536
+  hybrid_ratio: 3
+  trailing_global: true
+  n_dense_layers: 1
+  dense_ffn_hidden: 5632
+  tie_embeddings: true
+
+  kda:
+    num_heads: 32
+    head_dim_k: 64
+    head_dim_v: 64
+    alpha_rank: 128
+    conv_kernel: 4
+    chunk_size: 64
+    tile_size: 16
+
+  mla:
+    num_heads: 32
+    qk_head_dim: 64
+    v_head_dim: 64
+    q_lora_rank: 512
+    kv_lora_rank: 256
+
+  moe:
+    n_routed: 128
+    n_shared: 2
+    top_k: 8
+    latent_dim: 1024
+    expert_hidden: 1408
+    shared_hidden: 1408
+    rmsnorm_before_up: true
+    qb_enabled: true
+    qb_bins: 1000
+
+  attn_res:
+    enabled: true
+    block_size: 6
+    granularity: sublayer
+
+  mtp:
+    enabled: true
+    n_layers: 1
+    layer_kind: mla
+
+  vit:
+    enabled: true
+    n_layers: 12
+    dim: 768
+    num_heads: 12
+    patch_size: 14
+    mlp_hidden: 2048
+    pixel_shuffle: 2
+
+train:
+  steps: 200000
+  log_every: 20
+  out_dir: runs/small
+  dtype: bfloat16
+  gradient_checkpointing: true
+  curriculum: [8192, 32768, 131072, 262144]
+  curriculum_step_fractions: [0.6, 0.85, 0.95, 1.0]
+  optim:
+    lr: 0.0008
+    weight_decay: 0.1
+    schedule: cosine
+    warmup_ratio: 0.01
+  data:
+    tokenizer: hf
+    seq_len: 8192
+    micro_batch_size: 1
+    grad_accum: 8
+    vision_fraction: 0.25
+  parallel:
+    pp: 5
+    ep: 8
+    cp: 2
+    zero_stage: 2
+    pipeline_zero2: true
+    offload_grads_to_cpu: true
+    activation_policy: fp8
+    moonep: true
+    muon_p2p: true

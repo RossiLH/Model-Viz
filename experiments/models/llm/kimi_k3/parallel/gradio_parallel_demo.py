@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+"""K3 并行机制交互式演示 — 启动入口。
+
+运行：
+  cd Model-Viz/experiments/models/llm/kimi_k3/parallel
+  .venv/Scripts/python.exe gradio_parallel_demo.py
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+for _p in (_HERE,):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
+import matplotlib
+
+matplotlib.use("Agg")
+
+from plot_utils import setup_cjk_font
+
+setup_cjk_font()
+
+from _parallel_demo_ui import build_demo
+
+
+if __name__ == "__main__":
+    demo = build_demo()
+    demo.launch(server_name="0.0.0.0")
