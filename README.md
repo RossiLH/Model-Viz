@@ -347,7 +347,6 @@ Model-Viz/
 ├── experiments/                    # 镜像 src/ 的可运行 demo（gradio + plot + discussion）
 ├── scripts/                        # probe 脚本（探查上游实现的中间行为）
 ├── configs/                        # K3 配置（nano / micro / small / 2p8t）
-├── paper/                          # 参考论文 PDF（不入库；见"参考与致谢"中的 arXiv 链接）
 ├── pyproject.toml
 ├── requirements-dev.lock.txt       # 完整的开发环境锁定
 └── LICENSE                         # MIT
